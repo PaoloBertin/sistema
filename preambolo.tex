@@ -1,0 +1,48 @@
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{italian}
+\setmainfont{TeX Gyre Heros}
+\setsansfont{TeX Gyre Heros}
+\usepackage{csquotes}
+
+\usepackage{microtype}
+
+%  Margini e geometria pagina
+\usepackage{geometry}
+\geometry{top=1.5cm,
+          bottom=1.5cm,
+          left=2.5 cm,
+          right=2.5cm
+        }
+
+%  Grafica e immagini
+\usepackage{graphicx}
+% percorso generale immagini
+\graphicspath{{figure/}}
+
+%  Tabelle e struttura
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+
+%  Matematica
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+
+%  TikZ (per eventuali figure inline)
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, calc, positioning, shapes}
+
+%  Link e collegamenti
+\usepackage[hidelinks]{hyperref}
+
+% \usepackage{fancyhdr}
+% \pagestyle{fancy}
+
+% Creazione header e footer personalizzati
+
+% \renewcommand{\headrulewidth}{0pt}  % opzionale: rimuove linea
+
+%  Macro utili
+\newcommand{\fig}[1]{Figura~\ref{#1}}

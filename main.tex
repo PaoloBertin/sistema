@@ -1,0 +1,274 @@
+\documentclass[a4paper,11pt]{article}
+
+\input{preambolo.tex}
+
+% Informazioni sul documento
+\title{Manuale Software\\ SISTEMA}
+\author{Versione 1.0.0}
+\date{\today}
+
+\begin{document}
+	
+	\maketitle
+    \newpage
+
+	\tableofcontents		
+	\clearpage
+	
+	\section{Introduzione}	
+	% \bigskip
+	% figura compilata in un submodule
+	% \begin{figure}[h]
+	% 	\centering
+	% 	\includegraphics{figure/figura01/out/figura01.pdf}
+	% 	\caption{Figura generata in un submodule}
+	% \end{figure}
+	% \clearpage
+
+    \par\medskip\noindent
+    I sistemi di controllo che svolgono funzioni di sicurezza vengono impiegati per progettare macchine in modo sicuro e quindi soddisfare i requisiti della Direttiva Macchine 2006/42/CE. A tal fine, le funzioni di sicurezza necessarie per la riduzione del rischio vengono definite nell'ambito della valutazione del rischio condotta in fase di progettazione della macchina e quindi implementate mediante un sistema di controllo adeguato.
+    \par\medskip\noindent Le parti dei comandi della macchina relative alla sicurezza possono essere implementate in conformità alla norma EN ISO 13849-1. Tra i requisiti di questa norma rientra anche la necessità per il progettista della macchina di calcolare la probabilità di un guasto pericoloso all'ora (PFH) per determinare il Livello di Prestazione (PL). Il Livello di Prestazione dipende dalla struttura del sistema di controllo (Categoria) e dai requisiti sistematici.
+    \par\medskip\noindent
+    A tale scopo, l'IFA mette a disposizione lo strumento software SISTEMA (acronimo tedesco per "sicurezza dei comandi sulle macchine"), scaricabile gratuitamente da www.dguv.de/ifa, codice web e34183.
+    \par\medskip\noindent
+    Prima di iniziare i calcoli, il progettista della macchina deve generare uno schema a blocchi di sicurezza per ciascuna funzione di sicurezza a partire dallo schema elettrico. Lo schema a blocchi di sicurezza deve mostrare l'implementazione della funzione di sicurezza nei canali funzionali (inclusi i canali ridondanti, ove presenti) e nei componenti di test, ove presenti.
+    \par\medskip\noindent
+    Il Cookbook 1 di SISTEMA affronta questa fase di astrazione insolita e complessa (Figura 1) e la fase successiva, ovvero il trasferimento dei blocchi a SISTEMA e l'inserimento dei relativi parametri.
+    % \begin{figure}[h]
+    %     \centering
+    %     \tikzsetnextfilename{grafico01}  % Nome del file PDF che verrà generato
+    %     \begin{tikzpicture}[node distance=2cm]
+    %         \input{immagini_tikz/grafico01.tex}
+    %     \end{tikzpicture}
+    %     \caption{Grafico importato da file esterno}
+    % \end{figure}
+
+    Tabella 3: Descrizione dei livelli gerarchici in SISTEMA
+    
+    \clearpage
+
+    \section{Schema elettrico dei canali funzionali e di prova}
+    \subsection{Creazione dello schema elettrico del circuito}
+    \par\medskip\noindent Per calcolare in una fase successiva la probabilità di guasto di una funzione di sicurezza, è necessario conoscere quali componenti sono impiegati nella funzione di sicurezza e quali no. Una definizione precisa della funzione di sicurezza (vedere il Rapporto BGIA 2/2008, Capitolo 5) è quindi indispensabile per le fasi successive. Per ciascuna funzione di sicurezza viene prodotto uno schema elettrico che mostra i componenti rilevanti. I componenti rilevanti includono tutti quelli il cui guasto potrebbe compromettere l'esecuzione della funzione di sicurezza in un canale funzionale (le strutture ridondanti possiedono due canali funzionali). Includono anche tutti i dispositivi di prova responsabili del rilevamento di tali guasti pericolosi e del raggiungimento di uno stato sicuro. Uno schema elettrico mostra, ad esempio, il circuito elettrico degli interruttori di posizione, dei controllori logici programmabili (PLC) e dei contattori, nonché il flusso di corrente dal sensore, tramite l'elaborazione del segnale, all'attuatore.
+    
+    \par\medskip\noindent L'esempio 1 (Figura 2) mostra un'implementazione della funzione di sicurezza per "l'apertura del riparo mobile avvia la funzione di sicurezza Safe Torque Off (STO)". Tutti gli altri componenti puramente funzionali e che non hanno alcuna influenza sulla funzione di sicurezza sono già stati omessi.
+
+    Figura 2: Schema elettrico schematico che mostra i componenti rilevanti (Esempio 1); vedere il rapporto BGIA 2/2008e, Capitolo 8.2.18
+
+    \subsection{Inserimento dei canali di funzione e di prova}
+    \par\medskip\noindent I canali funzionali vengono innanzitutto contrassegnati sullo schema elettrico. Nella pratica, si è dimostrato efficace "procedere a ritroso", ovvero iniziare dall'estremità dell'attuatore e seguire il canale fino al sensore. In questo modo si ottengono i percorsi del segnale dall'evento di attivazione alla risposta della funzione di sicurezza (Figura 3).
+
+    Figura 3: Schema elettrico con due canali funzionali ridondanti, B1-Q2 e B2-K1-Q1 (Esempio 1)
+
+    \par\medskip\noindent Nei circuiti che utilizzano un canale di prova con un dispositivo di sezionamento dedicato (Categoria 2), anche questo canale di prova è contrassegnato sullo schema elettrico. La Figura 4 mostra l'esempio di un dispositivo di protezione installato all'ingresso di un rullo; quando il dispositivo interviene, il motore si arresta entro 1/3 di rotazione. In questo esempio, l'angolo di rotazione necessario affinché il motore si arresti viene testato regolarmente mediante l'azionamento manuale del dispositivo di protezione.
+
+    Figure 4: Example 2 with marked functional channel B0 - T1 - G1 and test channel with dedicated disconnect-ing device G2 - K1 - Q1
+    
+    \par\medskip\noindent Nel capitolo 3 viene spiegato come trasformare lo schema elettrico in uno schema a blocchi di sicurezza.
+    \clearpage
+    
+    \section{Dallo schema elettrico allo schema a blocchi di sicurezza}
+    \par\medskip\noindent Nella fase successiva, lo schema elettrico viene trasformato per ciascuna funzione di sicurezza nella rappresentazione logica dello schema a blocchi di sicurezza. Nel corso della trasformazione, i componenti dello schema elettrico vengono assegnati ai "sottosistemi" con cui la funzione di sicurezza viene modellata in SISTEMA.
+    
+    \par\medskip\noindent Nella rappresentazione come schema a blocchi di sicurezza, sono rilevanti le interrelazioni logiche piuttosto che le connessioni fisiche tra i componenti. Ogni componente all'interno di una funzione di sicurezza è parte costitutiva di una determinata struttura. Questa struttura è definita "Categoria" nella norma EN ISO 13849-1 e raggruppata in SISTEMA come sottosistema. Le sequenze dei sottosistemi con le relative Categorie sono rappresentate da una funzione di sicurezza sotto forma di schema a blocchi di sicurezza. La sequenza dei sottosistemi non ha alcuna influenza sul successivo calcolo della probabilità di guasto.
+    
+    \subsection{Categorie secondo EN ISO 13849-1}
+    \par\medskip\noindent Le categorie secondo EN ISO 13849-1, le loro caratteristiche caratterizzanti e la loro rappresentazione tipica sono riportate nella Tabella 1.
+
+    Tabella 1: Caratteristiche e rappresentazione delle Categorie
+    
+    \par\medskip\noindent Un caso particolare è costituito dai sottosistemi incapsulati. I sottosistemi incapsulati sono componenti per i quali il produttore stesso dichiara PL, PFH e Categoria (ad esempio, PLC di sicurezza, moduli di sicurezza); vedere la Tabella 2.
+
+    Tabella 2: Sottosistemi incapsulati
+
+    \par\medskip\noindent \textbf{Nota}: disposizioni dei componenti diverse da queste non sono conformi alle architetture designate della norma EN ISO 13849-1 e non possono essere analizzate da SISTEMA.
+
+    \subsection{Analisi strutturale e spiegazioni}
+    \par\medskip\noindent Nell'analisi strutturale, i componenti nello schema elettrico vengono trasferiti in uno schema a blocchi di sicurezza e la Categoria viene determinata mediante le caratteristiche di ridondanza, i test e l'utilizzo di componenti ben collaudati.
+    
+    \textbf{Nota}: questa sezione riguarda solo la determinazione della struttura. Ulteriori requisiti si applicano a tutte le Categorie: ad esempio, i componenti devono essere progettati, fabbricati, selezionati, assemblati e combinati in conformità con le norme pertinenti, in modo tale da essere in grado di resistere alle condizioni ambientali previste. Devono essere applicati i principi essenziali di sicurezza. Nelle Categorie 1, 2, 3 e 4, devono essere applicati anche i principi di sicurezza ben collaudati. Informazioni su questi aspetti sono disponibili nella norma EN ISO 13849-2. I requisiti quantitativi, il cui rispetto è verificato da SISTEMA, si applicano anche alle Categorie.
+    
+    \par\medskip\noindent La procedura qui descritta è orientata all'applicazione della norma EN ISO 13849-1 e delle sue "architetture designate" per le Categorie. Se la modellazione in una delle categorie non è possibile, anche omettendo componenti o canali aggiuntivi, il metodo semplificato descritto nella norma non può essere applicato. In questo caso, la probabilità di guasto deve essere verificata ricorrendo ad altri metodi, come la modellazione di Markov, come descritto nella norma EN 61508-6, Allegato B.
+
+    \par\medskip\noindent La procedura qui descritta è orientata all'applicazione della norma EN ISO 13849-1 e delle sue "architetture designate" per le Categorie. Se la modellazione per una delle categorie non è possibile, anche omettendo componenti o canali aggiuntivi, il metodo semplificato descritto nella norma non può essere applicato. In questo caso, la probabilità di guasto deve essere verificata ricorrendo ad altri metodi, come la modellazione di Markov, come descritto nella norma EN 61508-6, Allegato B.
+
+    \par\medskip\noindent \textbf{Procedura per l'analisi strutturale}:\\
+    Il punto di partenza per l'analisi strutturale è lo schema elettrico su cui sono contrassegnati i canali funzionali e di test. La procedura è illustrata schematicamente nell'Allegato E. La Figura 5 contiene la stessa procedura, insieme alla sua applicazione agli Esempi 1 e 2 illustrati nel Capitolo 2.
+    
+    \par\medskip\noindent\textbf{Fase 1} : Formazione di una sequenza dei componenti in un canale funzionale.\\
+    Tutti i componenti lungo il primo canale funzionale (quello con il minor numero di componenti) vengono scritti come blocchi da sinistra a destra (dal sensore all'attuatore).
+    
+    \par\medskip\noindent \textbf{Fase 2}: Considerazione del primo blocco. \\
+    Ogni singolo blocco del primo canale funzionale viene ora assegnato a turno ai sottosistemi della Categoria pertinente, in base alle caratteristiche delle Categorie.
+    
+    \par\medskip\noindent \textbf{Fase 3}: Il produttore del componente indica il PL e il PFH (e la Categoria)?\\
+    Un sottosistema incapsulato può essere riconosciuto come tale dal fatto che è già caratterizzato dal produttore da un PL (o SIL secondo gli standard IEC), PFH e Categoria (struttura interna). Non è necessario scomporre ulteriormente la struttura interna del sottosistema incapsulato.\\
+    \textbf{Nota}: se un sottosistema incapsulato di Categoria 3 o 4 occupa entrambi i canali funzionali ridondanti, entrambi i canali funzionali lo attraversano.
+    
+    \par\medskip\noindent \textbf{Fase 4}: È possibile escludere tutti i guasti dei componenti?\\
+    Si considerano a turno tutti i guasti presunti per il componente nel blocco in analisi. A tal fine, l'allegato della norma EN ISO 13849-2 contiene i modelli di guasto di diversi componenti utilizzati nei controlli delle macchine. Grazie a giustificate esclusioni di guasti, è possibile escludere alcuni guasti dei componenti. Per ogni caso di guasto, è necessario valutare se la funzionalità di sicurezza prevista del componente viene mantenuta (guasto innocuo) o se si guasta (guasto pericoloso). Un guasto pericoloso si verifica, ad esempio, per il contattore Q2 nell'Esempio 1 (Figura 3) quando la porta di sicurezza viene aperta, ma Q2 non si diseccita perché i suoi contatti si sono saldati. Se non è necessario ipotizzare alcun guasto pericoloso per il componente, non esiste alcun valore per il calcolo del PFH della funzione di sicurezza. Non è necessario considerarlo nello schema a blocchi relativo alla sicurezza. Un'ulteriore presentazione della funzione di sicurezza può tuttavia essere costruttiva, poiché può contribuire alla sua comprensione. In questo caso, il blocco viene trattato come un sottosistema incapsulato (l'opzione "esclusione guasti" viene quindi selezionata in SISTEMA e non sono necessari ulteriori inserimenti).
+    
+    \par\medskip\noindent \textbf{Fase 5}: La funzione di sicurezza viene mantenuta in caso di guasti dei componenti?\\
+    Nella Fase 4 vengono determinati i guasti pericolosi da ipotizzare per il componente nel blocco in analisi. Vengono ora considerati i loro effetti sulla funzione di sicurezza.
+
+    Figura 5: Diagramma di flusso dell'analisi strutturale con riferimento agli esempi del Capitolo 2: SF = funzione di sicurezza
+
+    \par\medskip\noindent \textbf{Fase 5a}: Aggiunta del canale funzionale ridondante del/i blocco/i\\
+    Se la funzione di sicurezza è mantenuta da uno o più componenti ridondanti in caso di guasto nel blocco in analisi (ovvero è presente un secondo canale funzionale), questi componenti vengono presentati come blocchi in un secondo canale funzionale (fare riferimento all'esempio nella Tabella 1: Categorie 3 e 4).
+    Nell'Esempio 1 (Figura 3), questo si applica sia a B1 che a Q2. Il canale funzionale ridondante B2-K1-Q1 viene quindi aggiunto a entrambi i blocchi.
+    
+    \par\medskip\noindent \textbf{Nota}: i componenti del canale funzionale ridondante vengono quindi utilizzati più volte. Questo è il risultato della procedura a fasi e non dovrebbe rappresentare un ostacolo in questa fase. I blocchi di cui esistono più istanze vengono nuovamente raggruppati nella Fase 8.
+    
+    Se sono stati inseriti componenti ridondanti, è stato soddisfatto un criterio di base importante per le Categorie 3 e 4. Un singolo guasto in un componente del primo o del secondo canale funzionale non deve comportare la perdita della funzione di sicurezza (tolleranza al singolo guasto).
+    \par\medskip\noindent \textbf{Nota}: Inoltre, la Categoria 3 richiede che, ove ragionevolmente possibile, vengano rilevati singoli guasti nei componenti all'interno dei due canali funzionali.
+    
+    \par\medskip\noindent \textbf{Fase 5b}: La funzione di sicurezza viene mantenuta in caso di accumulo di guasti non rilevati?\\
+    Per il blocco in analisi e il suo canale funzionale ridondante, la tolleranza al singolo guasto è stata identificata fino a questo punto e la Categoria 3 è soddisfatta. Sono soddisfatti anche i criteri per la Categoria 4? A tal fine, è necessario studiare il comportamento in caso di guasti non rilevati. Se la funzione di sicurezza viene mantenuta in caso di accumulo di due guasti non rilevati, il sottosistema soddisfa la Categoria 4. Se la funzione di sicurezza non viene mantenuta al secondo guasto non rilevato, il sottosistema soddisfa la Categoria 3.
+    
+    Nell'Esempio 1 (Figura 3), il PLC K1 potrebbe attivare le uscite O1.0 e O1.1 in modo continuo in caso di guasto. In questo caso, Q1 sarebbe costantemente eccitato. Anche se il PLC fosse in grado di rilevare questo guasto tramite la lettura dei contatti di monitoraggio, non sarebbe in grado di attivare lo stato di sicurezza. Se un secondo guasto dovesse causare la saldatura dei contatti di Q2, il motore continuerebbe a funzionare anche con il dispositivo di protezione aperto; la funzione di sicurezza è venuta meno e la Categoria 4 non è soddisfatta.
+    
+    \par\medskip\noindent \textbf{Nota}: nella Categoria 4, la tolleranza al singolo guasto deve essere soddisfatta e il guasto discreto in un componente del primo o del secondo canale funzionale deve essere rilevato al momento o prima della successiva richiesta alla funzione di sicurezza. Se il rilevamento in questo modo non è possibile, l'accumulo di due guasti non rilevati non deve comportare la perdita della funzione di sicurezza.
+    
+    \par\medskip\noindent \textbf{Fase 6}: Vengono rilevati i guasti dei componenti?\\
+    A questo punto, è chiaro che non vi è ridondanza e che di conseguenza non è soddisfatta né la Categoria 3 né la Categoria 4. Se il guasto di un blocco in un canale di test viene rilevato da un canale di test e viene attivato lo stato sicuro, il sottosistema soddisfa la Categoria 2.\\
+    Nell'Esempio 2 (Figura 4), l'intervento di B0 provoca l'arresto controllato del motore da parte di T1/G1 entro 1/3 di giro. Il test avviene in risposta a una richiesta di K1, provocata dall'azionamento manuale di B0 e dalla misurazione dell'angolo di arresto da parte di K1/G2. In caso di guasto, lo stato sicuro viene attivato tramite Q1. Il test rileva i guasti in B0 e T1/G1. Il canale di test G2-K1-Q1 rileva quindi i guasti in B0 e T1/G1 e attiva lo stato sicuro; La Categoria 2 è quindi soddisfatta.
+     
+    \par\medskip\noindent \textbf{Nota}: il rilevamento ragionevole dei guasti è un requisito anche per le Categorie 3 e 4. Al contrario, i sottosistemi di Categoria 2 non dispongono di un canale funzionale ridondante.
+
+    \par\medskip\noindent \textbf{Fase 6a}: Aggiunta del canale di test del blocco\\
+    I componenti del canale di test che rilevano il guasto del blocco e determinano lo stato sicuro sono presentati nello schema a blocchi di sicurezza come blocchi di test, come mostrato nella Tabella 1 (Categoria 2).\\
+    Se i componenti vengono inseriti nel canale di test, viene soddisfatto un criterio fondamentale per la Categoria 2: la funzione di sicurezza deve essere testata a intervalli adeguati. Ciò determina il rilevamento della perdita della funzione di sicurezza e il raggiungimento dello stato sicuro tramite un dispositivo di disconnessione indipendente. Un ulteriore requisito importante per la Categoria 2 è la frequenza di test (vedere il Rapporto BGIA 2/2008e, Sezione 6.25). Tuttavia, questo non è rilevante per l'analisi strutturale.
+    
+    \par\medskip\noindent \textbf{Fase 7}: Il componente è "ben collaudato"?\\
+    Nell'esempio non è stata riscontrata ridondanza o test. Sono quindi possibili solo la Categoria 1 o la Categoria B. Se il componente nel blocco in analisi è un componente "ben collaudato" secondo la norma EN ISO 13849, il blocco viene presentato come parte di un sottosistema di Categoria 1. Un elenco di componenti ben collaudati è disponibile nella norma EN ISO 13849-2. In caso contrario, il blocco fa parte di un sottosistema di Categoria B.
+    
+    \par\medskip\noindent \textbf{Fase 8}: Tutti i blocchi sono stati analizzati?\\
+    Se ulteriori blocchi sono ancora in attesa di analisi dopo l'assegnazione del blocco a un sottosistema, la procedura illustrata nel diagramma viene ripetuta con il blocco successivo, iniziando dalla Fase 2a. In caso contrario, la procedura continua dalla Fase 9.
+    
+    \par\medskip\noindent \textbf{Fase 9}: Raggruppamento di blocchi della stessa categoria\\
+    I sottosistemi della stessa categoria possono essere uniti raggruppando componenti di canali identici (vedere il Rapporto BGIA 2/2008, Figura 6.14). Ogni componente è presente una sola volta all'interno di un canale; i duplicati possono essere rimossi. Lo stesso componente chiaramente non può essere utilizzato simultaneamente in due canali funzionali ridondanti. Nella Categoria 2, solo i componenti che condividono lo stesso canale di test possono essere raggruppati in un canale funzionale.\\
+    Poiché SISTEMA limita i valori MTTF\textsubscript{d} di ciascun canale all'interno dei sottosistemi (capping), il raggruppamento può comportare una minore probabilità di calcolo di un guasto pericoloso all'ora. La minore probabilità di guasto (PFH) è un vantaggio. Tuttavia, uno svantaggio è che la rappresentazione raggruppata spesso rende più difficile seguire la sequenza logica dell'elaborazione del segnale.\\
+    Gli esempi del Capitolo 2 producono i diagrammi a blocchi relativi alla sicurezza nella Figura 5a:
+    
+    Figura 5a: Risultato dell'analisi strutturale per gli esempi del Capitolo 2
+
+    La funzione di sicurezza è ora rappresentata logicamente sullo schema a blocchi relativo alla sicurezza. Nel capitolo successivo, la probabilità di guasto (PFH) viene calcolata con l'ausilio di SISTEMA.
+    \clearpage
+    \section{Trasferimento a SISTEMA}
+    \par\medskip\noindent Lo strumento software SISTEMA utilizza più livelli gerarchici (Figura 6). I singoli livelli sono spiegati nella Tabella 3.\\
+    % \begin{table}[ht]
+    %     \footnotesize
+    %     \centering
+    %     \begin{tabular}{|p{0.17\textwidth}|p{0.47\textwidth}|p{0.28\textwidth}|}\hline
+    %         % Intestazione
+    %         \textbf{Nome} & \textbf{Descrizione} & \textbf{Esempi} \\ \hline
+    %         % Riga 1
+    %         \textbf{Project} & Riepilogo delle funzioni di sicurezza, ad esempio su una macchina o parte di una macchina, o in un punto pericoloso & Porta per l'area di lavoro sul tornio XY \\ \hline
+    %         % Riga 2
+    %         \textbf{Funzione Sicurezza} & Risposta orientata alla sicurezza a un evento scatenante & Arresto operativo sicuro quando viene aperta una porta di sicurezza \\ \hline
+    %         % Riga 3
+    %         \textbf{Sottosistema} & Gruppo di blocchi all'interno di una struttura rigida (Categoria) & Sottosistema di categoria 3 \\ \hline
+    %         % Riga 4
+    %         \textbf{Canale} & Collegamento di blocchi in serie; SISTEMA crea uno o due canali funzionali, a seconda della categoria selezionata. & Canale funzionale 1\\ \hline
+    %         % Riga 5
+    %         \textbf{Canale di prova} & Collegamento di blocchi in serie per la funzione di test; SISTEMA crea un canale di test solo per la Categoria 2. & Canale funzionale 1 \\ \hline
+    %         % Riga 6
+    %         \textbf{Blocco} & Componente nel canale di funzione o di prova & Safety PLC\\ \hline
+    %         % Riga 7
+    %         \textbf{Elemento} & Un blocco contiene uno o più elementi. Un valore B10d (vedere Allegato B) può essere inserito solo per gli elementi. & Contattori, interruttori di posizione, componenti elettromeccanici, tutti i componenti con valore B10d del produttore \\ \hline
+    %     \end{tabular}
+    %     \caption{Descrizione dei livelli gerarchici in SISTEMA}
+    % \end{table}
+    Di seguito vengono spiegati tutti i passaggi necessari per la creazione di un progetto SISTEMA e per l'analisi. Le voci relative alla documentazione non influiscono in alcun modo sull'analisi. Questo aspetto non verrà ulteriormente esaminato.\\
+    \par\medskip\noindent \textbf{Nota}: si consiglia di selezionare l'ordine delle voci in modo che le schede nell'area di lavoro vengano visualizzate da sinistra a destra e i livelli gerarchici (visualizzazione ad albero nella finestra di navigazione) dall'alto verso il basso.
+    \subsection{Creare un progetto} % 4.1
+    \par\medskip\noindent Tutte le funzioni di sicurezza di una macchina o di una sotto-macchina possono essere raggruppate in un progetto (Figura 7). Dopo aver creato un nuovo progetto con "Nuovo" (1.), immettere un nome nella finestra di dialogo "Nome progetto" (3.). Il nome apparirà anche nella finestra di navigazione dopo l'abbreviazione PR (2.).
+
+    \subsection{Creazione di funzioni di sicurezza} % 4.2
+    Creare le funzioni di sicurezza desiderate con "Nuovo" (3.) nella scheda "Funzione di sicurezza" (2.) (Figura 8). Nella finestra di navigazione, dopo l'abbreviazione SF, compare anche il "Nome della funzione di sicurezza" (vedere Figura 9; 1.).
+    
+    \subsection{Impostazione del PL\textsubscript{r}}   % 4.3
+    Il Performance Level PL\textsubscript{r} richiesto viene determinato individualmente per ciascuna funzione di sicurezza (1.) (Figura 9). A tale scopo, utilizzare il grafico dei rischi (3.) alla voce "Funzione di sicurezza - PL\textsubscript{r}" (2.) oppure immettere direttamente il PL\textsubscript{r}, ad esempio quando è specificato da una norma specifica per una macchina.
+
+    \subsection{Aggiunta di sottosistemi} % 4.4
+    Vengono creati i sottosistemi determinati nello schema a blocchi di sicurezza. Aggiungere un sottosistema con "Nuovo" (3.) sotto la funzione di sicurezza (1.) nella scheda "Sottosistemi" (2.) (Figura 10).
+
+    \subsection{Sottosistemi incapsulati} % 4.5
+    I dati del produttore relativi a PL, PFH e Categoria sono disponibili per i sistemi incapsulati. Inserirli (4.) direttamente sotto il sottosistema (1.) nella scheda "PL" (2.) dopo aver selezionato "Inserisci PL / PFH direttamente" (3.) (Figura 11). La Categoria può essere inserita nella scheda successiva, "Categoria". Poiché PL e PFH sono disponibili per questo sottosistema, non è necessario inserire la Categoria per il calcolo del PFH della funzione di sicurezza nel suo complesso.\\
+    \textbf{Nota}: se la casella (4.) è selezionata, PL e PFH vengono calcolati l'uno dall'altro mediante valori medi.\\
+    Esclusione guasti:\\
+    Nei sistemi incapsulati in cui sono esclusi tutti i guasti dei componenti pericolosi, selezionare la casella "Esclusione guasti" ($\Rightarrow$ PFH=0).
+
+    \subsection{Sottosistemi come gruppi di blocchi all'interno di una struttura rigida (Categoria)} % 4.6
+    Nel sottosistema (1.), selezionare "Determinare PL/PFH da categoria, MTTF\textsubscript{d} e DC\textsubscript{avg}" sotto "PL" (2.) (Figura 12).
+    Quindi:\\
+
+    % \begin{enumerate}[label=\alph*]
+    %      \item Nel sottosistema %(1.) sotto "Categoria" (2.) (Figura 13), selezionare la Categoria pertinente e valutare i "Requisiti della Categoria".
+    %      \item Inserire il valore MTTFd direttamente nel sottosistema (1.) alla voce "MTTFd" (2.), oppure selezionare "Determina il valore MTTFd dai blocchi" (3.) (Figura 14). 1. 2. 3. Figura 14
+    %      \item Inserire il valore DCavg direttamente nel sottosistema (1.) alla voce "DCavg" (2.), oppure selezionare "Determina il valore DCavg dai blocchi" (3.) (Figura 15). 1. 2. 3. Figura 15
+    %      \item Per ogni sottosistema a due canali, devono essere considerati i guasti che causerebbero il guasto di entrambi i canali per lo stesso motivo (CCF). Tra questi, sono interessati la Categoria 2 (canale funzionale e canale di prova) e le Categorie 3 e 4 (due canali funzionali in ciascun caso). L'inserimento avviene nel sottosistema (1.) alla voce "CCF" (2.) selezionando le misure da adottare (Figura 16). Devono essere raggiunti almeno 65 punti. Il numero di punti raggiunti può essere inserito direttamente o compilato da una libreria di misure (3. e 4.).
+    % \end{enumerate}
+    
+    \subsubsection{Inserimento dei blocchi}
+    Una volta formati i sottosistemi, sono necessarie ulteriori specifiche (eccezione: 4.5 Sottosistemi incapsulati). Selezionando la Categoria di un sottosistema, SISTEMA crea i canali pertinenti (CH). In "Canale", vengono aggiunti i blocchi (BL) corrispondenti ai singoli componenti di un canale. Se non è necessaria un'ulteriore suddivisione dei blocchi, la procedura può continuare con 4.6.3. Se un blocco deve essere ulteriormente suddiviso in elementi (sempre necessario con componenti per i quali è specificato il valore B10d), sono necessarie le seguenti impostazioni:
+    % \begin{enumerate}[label=\alph*]
+    %     \item Nel blocco (1.) alla voce "MTTFd" (2.), selezionare "Determina il valore MTTFd dagli elementi" (3.) (Figura 17).
+    %     \item In block (1.) under "DC" (2.), select "Determine DC-value from elements" (3.) (Figure 18). 
+    % \end{enumerate}
+
+    \subsubsection{Inserimento di elementi}
+    Se un blocco deve essere suddiviso in elementi (EL), creare elementi nel blocco (1.) in "Elementi" (2.) con "Nuovo" (3.) (Figura 19).
+    A livello di elemento (1.), è necessario effettuare il calcolo tenendo conto del valore B10\textsubscript{d} e del numero di operazioni n\textsubscript{op}, ad esempio per determinare l'MTTF\textsubscript{d} (2.) di componenti elettromeccanici e pneumatici (Figura 20). Selezionare "Determina il valore MTTF\textsubscript{d} dal valore B10\textsubscript{d}" (3.) e "Calcola n\textsubscript{op}" (4.) per inserire i valori richiesti (5.)
+    
+    \subsubsection{Inserimento dei dati relativi alla sicurezza}
+    I dati relativi alla sicurezza richiesti per il calcolo del PFH includono la qualità applicabile del componente (MTTF\textsubscript{d}, B10\textsubscript{d}), il numero di operazioni dei componenti elettromeccanici e pneumatici (n\textsubscript{op}) e la copertura diagnostica (\textbf{D}).
+    
+    \paragraph{MTTF\textsubscript{d}/B10\textsubscript{d}}
+    Inserire a livello di blocco o elemento (1.) nella scheda "MTTFd" (2.) (Figura 21).
+    I parametri relativi alla sicurezza dei componenti possono essere determinati da uno qualsiasi dei seguenti:
+    % \begin{enumerate}[label=\alph*]
+    %      \item Dati dei produttori
+    %      \item Raccolte di dati consolidate (per le fonti, vedere EN ISO 13849-1, Allegato D)
+    %      \item EN ISO 13849-1, Allegato C; memorizzato in SISTEMA alla voce "Valori tipici dei componenti" (3.).
+    % \end{enumerate}
+    Se è possibile escludere tutti i guasti pericolosi dei componenti, è possibile selezionare un'esclusione guasti anche selezionando "Inserisci direttamente il valore MTTFd".
+    \paragraph{\textbf{DC}}
+    Per la Categoria 2 e superiore, sono richieste misure di rilevamento guasti per i componenti. Nel blocco o elemento (1.), nella scheda "DC" (2.) viene inserita una percentuale per ciascun componente per descrivere la copertura diagnostica del rilevamento guasti. Selezionando "Valore DC tramite la scelta delle misure" è possibile accedere alle tabelle DC della norma EN ISO 13849-1, Allegato E, tramite "Libreria" (3.). I valori possono essere accettati così come sono o utilizzati come guida. Laddove la norma proponga un intervallo di possibili valori DC, è possibile selezionare un valore concreto all'interno di tale intervallo (Figura 22).
+
+    \subsection{Obiettivo raggiunto?} % 4.7
+    Verificare la presenza di messaggi di errore (croce rossa) nella finestra dei messaggi (al centro, in basso). Se non sono presenti messaggi di errore, è possibile calcolare il PFH (Figura 23).
+
+    Il risultato del calcolo è indicato in basso a sinistra per la funzione di sicurezza selezionata e i corrispondenti sottosistemi, blocchi ed elementi (Figura 24). Il PL (raggiunto) della funzione di sicurezza deve essere almeno uguale al PL\textsubscript{r} (richiesto). Se il PL raggiunto non è sufficiente, è necessario utilizzare componenti con un MTT\textsubscript{d} più elevato o un valore di B10\textsubscript{d} più elevato, migliorare il rilevamento dei guasti (DC) o implementare sottosistemi di altre categorie.
+    \newpage
+    
+    \paragraph{Allegato A: Concetti e abbreviazioni}
+    Definizione dei concetti chiave a cui si fa riferimento in modo simile nell'Allegato B della norma EN ISO 13849-1:
+
+    % \begin{table}[ht]
+    %     \footnotesize
+    %     \centering
+    %     \begin{tabular}{|p{0.3\textwidth}|p{0.64\textwidth}|}\hline
+    %         % Intestazione
+    %         \textbf{Funzione Sicurezza (SF)} & \textbf{Definizione} \\ \hline
+    %         % Riga 1
+    %         \textbf{Project} & Risposta orientata alla sicurezza a un evento scatenante (richiesta alla
+    %         funzione di sicurezza). Nei sistemi ridondanti, la funzione di sicurezza viene eseguita in modi multipli e indipendenti. Il PL descrive l'affidabilità della sua esecuzione.pericoloso \\ \hline
+    %         \textbf{Schema elettrico del circuito} & Estratto dallo schema elettrico o dallo schema circuitale funzionale che indica le interconnessioni tecniche (hardware) tra le parti del sistema di controllo relative alla sicurezza. \\ \hline
+    %         \textbf{Schema a blocchi relativo alla sicurezza} & Presentazione delle connessioni logiche tra i componenti, da cui si possono vedere i canali funzionali e di test. \\ \hline
+    %         \textbf{Componenti} & Unità hardware relative alla sicurezza, parti del sistema di controllo. \\ \hline
+    %         \textbf{Sottosistema (SB)} & Unità più grande di componenti che esegue la funzione di sicurezza completamente o in sezioni. Un sottosistema possiede una struttura continua ed è descritto da una Categoria. \\ \hline
+    %         \textbf{Sottosistema incapsulato} & Componente di sicurezza per il quale il produttore dichiara già PL, PFH e Categoria. La struttura interna non deve quindi essere considerata più attentamente. \\ \hline
+    %         \textbf{Canale Funzionale}  & Componente di sicurezza per il quale il produttore dichiara già PL, PFH e Categoria. La struttura interna non si sviluppa quindi essere considerato più attentamente.\\ \hline
+    %         \textbf{Segnale di funzione} & Segnale che trasmette la richiesta della funzione di sicurezza lungo un canale funzionale dal sensore all'attuatore, dove ad esempio ne provoca la disconnessione. \\ \hline
+    %         \textbf{Blocco funzionale ridondante} & Unità hardware collegata in parallelo; componente in una sezione di un canale funzionale ridondante; parte di un canale funzionale in sottosistemi di categoria 3 o 4. \\ \hline
+    %         \textbf{Blocco funzionale non ridondante} & Componente in una sezione di un canale funzionale non ridondante; parte di un canale funzionale nei sottosistemi di Categoria B, 1 o 2. \\ \hline
+    %         \textbf{Canale di prova} & Catena di componenti che trasmette un segnale di disconnessione "Test" (da non confondere con il percorso del segnale attraverso il quale i segnali di test vengono scambiati tra i blocchi di test e quelli testati per il rilevamento di un guasto pericoloso). \\ \hline
+    %         \textbf{Test del segnale di disconnessione} & Trasmette il risultato di un test che ha rilevato un guasto pericoloso di un blocco funzionale, da un blocco di test a un blocco funzionale più avanti o a un blocco di disconnessione aggiuntivo, con il risultato che la funzione di sicurezza viene completata con successo o che viene instaurato uno stato sicuro. \\ \hline
+    %         \textbf{Blocco di prova} & Unità hardware per la diagnostica: Componente che testa uno o più blocchi funzionali e genera un segnale di disconnessione "Testing" quando rileva un guasto pericoloso in essi; oppure un blocco di trasmissione o disabilitazione nel canale di test. \\ \hline
+    %         \textbf{Principio della corrente a circuito chiuso} & L'interruzione di un circuito porta allo stato sicuro. \\ \hline
+
+    %     \end{tabular}
+    %     % \caption{Descrizione dei livelli gerarchici in SISTEMA}
+    % \end{table}
+\end{document}

@@ -1,0 +1,62 @@
+{
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 192,
+    "editor.rulers": [192],
+    "editor.formatOnSave": true,
+    "latex-workshop.formatting.latex": "latexindent",
+    
+    // Compilazione continua
+    "latex-workshop.latex.autoBuild.run": "onSave",
+
+    // latexmk come motore di compilazione
+    "latex-workshop.latex.tools": [
+        {
+            "name": "latexmk-lualatex",    
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-outdir=%OUTDIR%", 
+                "-lualatex",
+                "-shell-escape",
+                "%DOC%"
+            ]
+        }
+    ],
+
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "LuaLaTeX (latexmk, shell-escape)",
+            "tools": ["latexmk-lualatex"]
+        }
+    ],
+
+    "latex-workshop.latex.recipe.default": "LuaLaTeX (latexmk, shell-escape)",
+
+    // Visualizzazione PDF in tab
+    // "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.view.pdf.viewer": "external",
+    "latex-workshop.view.pdf.external.viewer.command": "C:\\Users\\Paolo\\AppData\\Local\\SumatraPDF\\SumatraPDF.exe",
+    "latex-workshop.view.pdf.external.viewer.args": [
+        "%PDF%"
+    ],
+
+    "latex-workshop.view.pdf.refresh.afterBuild.enabled": true,
+    "latex-workshop.synctex.afterBuild.enabled": true,
+
+    // Output in cartella dedicata
+    "latex-workshop.latex.outDir": "out",
+
+    // Supporto a figure standalone dei submodule
+    "latex-workshop.latex.rootFile.useSubFile": true,
+
+    // ====== PATH INTELLISENSE ======
+    "path-intellisense.autoSlashAfterDirectory": true,
+    "path-intellisense.showHiddenFiles": false,
+
+    // ====== GIT E SUBMODULE ======
+    "git.detectSubmodules": true,
+    "git.openRepositoryInParentFolders": "always",
+    "git.autofetch": true
+}

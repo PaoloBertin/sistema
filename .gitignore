@@ -1,0 +1,23 @@
+# LaTeX temporanei
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+
+# LuaLaTeX
+*.lua
+*.luac
+
+# file pdf
+*.pdf
+
+# file temporanei
+tmp*.tex
